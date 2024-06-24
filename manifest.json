@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "Auto Data Capture",
+    "version": "1.0",
+    "description": "Capture data from a webpage and send it to Google Sheets",
+    "permissions": [
+      "activeTab",
+      "storage",
+      "scripting"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "time-left.png",
+        "48": "time-left.png",
+        "128": "time-left.png"
+      }
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://mt.ihx.in/services/bill/portal/qc"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
