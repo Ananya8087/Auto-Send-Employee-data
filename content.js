@@ -16,8 +16,11 @@ window.addEventListener('load', () => {
       }
     }, 500); // Check every 500ms
   }
-  function sendDataToGoogleSheet(data) {
-    fetch('https://script.google.com/macros/s/AKfycbypYX1ZzWxebYOQQM5V4DgUz-xdC4bsfl71U1yNHRMk2JeGyNgaiMC3CJhQW27tUcrJ/exec', {
+
+  // Function to send data to Google Sheets with claim status
+  function sendDataToGoogleSheet(data, claimStatus) {
+    data.claim_status = claimStatus; // Update claim status in data object
+    fetch('https://script.google.com/macros/s/AKfycbyTkJysE2o5dxmNNk18-7LUybw130On4MzghRThE7TUzTgkS0No2V5S2_491-3lrqZw/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: {
@@ -73,7 +76,7 @@ window.addEventListener('load', () => {
 
     // Function to fetch all caseIds from Google Sheets
     function fetchAllCaseIds(callback) {
-      fetch('https://script.google.com/macros/s/AKfycbypYX1ZzWxebYOQQM5V4DgUz-xdC4bsfl71U1yNHRMk2JeGyNgaiMC3CJhQW27tUcrJ/exec')
+      fetch('https://script.google.com/macros/s/AKfycbyTkJysE2o5dxmNNk18-7LUybw130On4MzghRThE7TUzTgkS0No2V5S2_491-3lrqZw/exec')
         .then(response => response.json())
         .then(allData => {
           console.log('Existing case IDs:', allData.caseIds);
@@ -113,15 +116,6 @@ window.addEventListener('load', () => {
       // No need to log "No duplicate found. Ready to submit." again here
     });
 
-    // Select the Update button
-    const updateButton = document.querySelector('button.btn_header.reject_btn.patient_update_btn[data-v-d19b1848]');
-
-    // Add click listener to Update button
-    updateButton.addEventListener('click', () => {
-      console.log('Update button clicked');
-      updateCashDiscount(); // Update cashDiscount when the button is clicked
-    });
-
     // Add input event listener to cashDiscountElement
     const cashDiscountElement = sidebarElement.querySelector('.p-field.p-col input[type="text"][placeholder="enter amount"]');
     cashDiscountElement.addEventListener('input', updateCashDiscount);
@@ -153,13 +147,29 @@ window.addEventListener('load', () => {
       console.log('Final Data after detailAmount update:', data);
     });
 
-    // Select the Submit button
-    const savebutton = document.querySelector('.qcButtons .qc_reject_btn');
+    // Select the Update button
+    const updateButton = document.querySelector('.btn_header.reject_btn.patient_update_btn');
 
-    // Add click listener to submit button
-    savebutton.addEventListener('click', () => {
-      console.log('Submit button clicked');
-      sendDataToGoogleSheet(data); // Call function to send data to Google Sheets
+    // Add click listener to Update button
+    updateButton.addEventListener('click', () => {
+      console.log('Update button clicked');
+      updateCashDiscount(); // Update cashDiscount when the button is clicked
+    });
+
+    // Select the Save Draft button and <span class="pi pi-plus-circle p-button-icon"></span> button
+    const saveDraftButton = document.querySelector('.qcButtons .qc_reject_btn'); // Adjust selector as per your HTML structure
+    const failButton = document.querySelector('span.pi.pi-plus-circle.p-button-icon'); // Adjust selector as per your HTML structure
+
+    // Add click listener to save draft button
+    saveDraftButton.addEventListener('click', () => {
+      console.log('Save Draft button clicked');
+      sendDataToGoogleSheet(data, 'QC Pass'); // Send data with claim status as "QC Pass"
+    });
+
+    // Add click listener to fail button
+    failButton.addEventListener('click', () => {
+      console.log('Fail button clicked');
+      sendDataToGoogleSheet(data, 'QC Fail'); // Send data with claim status as "QC Fail"
     });
   });
 });
