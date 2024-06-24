@@ -9,7 +9,7 @@ function doPost(e) {
     
     var data = JSON.parse(e.postData.contents);
 
-    var { caseType, email, caseId, cashDiscount, claimedAmount } = data;
+    var { caseType, email, caseId, cashDiscount, claimedAmount, detailAmount } = data;
 
     // Fetch all existing case IDs from the 4th column (assuming it's in column D)
     var range = sheet.getRange(2, 4, sheet.getLastRow() - 1, 1);
@@ -23,7 +23,7 @@ function doPost(e) {
     }
 
     // Append the data to the spreadsheet if caseId is not found
-    sheet.appendRow([new Date(), caseType, email, caseId, cashDiscount, claimedAmount]);
+    sheet.appendRow([new Date(), caseType, email, caseId, cashDiscount, claimedAmount, detailAmount]);
 
     // Respond with success
     return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
