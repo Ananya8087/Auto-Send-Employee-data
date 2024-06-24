@@ -1,5 +1,8 @@
 console.log('Content script is running');
 
+// Define data outside the window load event listener scope
+let data = {};
+
 window.addEventListener('load', () => {
   console.log('Window loaded, capturing initial data');
 
@@ -12,6 +15,25 @@ window.addEventListener('load', () => {
         callback(sidebarElement);
       }
     }, 500); // Check every 500ms
+  }
+  function sendDataToGoogleSheet(data) {
+    fetch('https://script.google.com/macros/s/AKfycbypYX1ZzWxebYOQQM5V4DgUz-xdC4bsfl71U1yNHRMk2JeGyNgaiMC3CJhQW27tUcrJ/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log('Data sent successfully:', result);
+      // Handle success if needed
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
+      // Handle error if needed
+    });
   }
 
   // Wait for the sidebar element
@@ -37,12 +59,13 @@ window.addEventListener('load', () => {
     const caseType = caseTypeElement ? 'RI' : 'PA';
 
     // Create the data object
-    const data = {
+    data = {
       caseType: caseType,
       email: email || 'N/A',
       caseId: caseId || 'N/A',
       cashDiscount: cashDiscount || '0',
-      claimedAmount: claimedAmount || 'N/A'
+      claimedAmount: claimedAmount || 'N/A',
+      detailAmount: 'N/A'  // Placeholder for detailAmount
     };
 
     // Log the captured data to the console
@@ -103,6 +126,33 @@ window.addEventListener('load', () => {
     const cashDiscountElement = sidebarElement.querySelector('.p-field.p-col input[type="text"][placeholder="enter amount"]');
     cashDiscountElement.addEventListener('input', updateCashDiscount);
 
+    // Function to find the element and extract its inner text with a delay
+    function extractDetailAmountWithDelay(callback) {
+      // Find the element
+      var detailAmountElement = document.querySelector('p.detail_amnt_data b');
+      console.log(detailAmountElement);
+      
+      // Check if the element exists
+      if (detailAmountElement) {
+          // Set a delay before extracting the inner text
+          setTimeout(function() {
+              // Extract the inner text after the delay
+              var detailAmountValue = detailAmountElement.textContent.trim();
+              console.log('Detail Amount:', detailAmountValue);
+              callback(detailAmountValue);
+          }, 2000); // 2000 milliseconds delay (2 seconds)
+      } else {
+          console.log('Detail Amount element not found.');
+          callback('N/A');
+      }
+    }
+
+    // Call the function and update the data object with detailAmount
+    extractDetailAmountWithDelay(function(detailAmountValue) {
+      data.detailAmount = detailAmountValue || 'N/A';
+      console.log('Final Data after detailAmount update:', data);
+    });
+
     // Select the Submit button
     const savebutton = document.querySelector('.qcButtons .qc_reject_btn');
 
@@ -111,27 +161,5 @@ window.addEventListener('load', () => {
       console.log('Submit button clicked');
       sendDataToGoogleSheet(data); // Call function to send data to Google Sheets
     });
-
   });
-//#app > div > section > div > div.p-col-7 > div.qc_options_data.d-md-flex.justify-content-between > div.qcButtons > button.btn_header.reject_btn.mt-1.me-0.qc_reject_btn.solid_green_btn
-  // Function to send data to Google Sheets
-  function sendDataToGoogleSheet(data) {
-    fetch('https://script.google.com/macros/s/AKfycbypYX1ZzWxebYOQQM5V4DgUz-xdC4bsfl71U1yNHRMk2JeGyNgaiMC3CJhQW27tUcrJ/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(result => {
-      console.log('Data sent successfully:', result);
-      // Handle success if needed
-    })
-    .catch(error => {
-      console.error('Error sending data:', error);
-      // Handle error if needed
-    });
-  }
 });
