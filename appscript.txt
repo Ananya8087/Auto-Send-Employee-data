@@ -1,0 +1,52 @@
+// Replace 'your_spreadsheet_id' with your actual Google Sheet ID
+var sheet = SpreadsheetApp.openById('1O2aH9Spd8SB1Qx7MNg6nI2u6sN_Kq1Xk8wJGvrUk2I4').getActiveSheet();
+
+function doPost(e) {
+  try {
+    if (!e.postData || !e.postData.contents) {
+      throw new Error('No POST data found');
+    }
+    
+    var data = JSON.parse(e.postData.contents);
+
+    var { caseType, email, caseId, cashDiscount, claimedAmount } = data;
+
+    // Fetch all existing case IDs from the 4th column (assuming it's in column D)
+    var range = sheet.getRange(2, 4, sheet.getLastRow() - 1, 1);
+    var existingCaseIds = range.getValues().flat().filter(String); // Filter out empty cells
+
+    // Check if the caseId already exists
+    if (existingCaseIds.includes(caseId)) {
+      console.log('Duplicate caseId found:', caseId);
+      return ContentService.createTextOutput(JSON.stringify({ status: 'duplicate', caseId: caseId }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Append the data to the spreadsheet if caseId is not found
+    sheet.appendRow([new Date(), caseType, email, caseId, cashDiscount, claimedAmount]);
+
+    // Respond with success
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    console.error('Error processing POST request:', error);
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: error.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  try {
+    // Fetch all existing case IDs from the 4th column (assuming it's in column D)
+    var range = sheet.getRange(2, 4, sheet.getLastRow() - 1, 1);
+    var existingCaseIds = range.getValues().flat().filter(String); // Filter out empty cells
+
+    // Respond with the list of case IDs
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', caseIds: existingCaseIds }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    console.error('Error processing GET request:', error);
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: error.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
