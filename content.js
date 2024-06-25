@@ -65,7 +65,7 @@ window.addEventListener('load', () => {
   qcPassButton.style.position = "absolute";
   qcPassButton.textContent = 'QC Pass';
   qcPassButton.className = 'qcButton';
-  qcPassButton.style.top = '49px';
+  qcPassButton.style.top = '45px';
   qcPassButton.style.right = '115px';
   qcPassButton.style.backgroundColor = "LawnGreen";
   mainSectionContainer.appendChild(qcPassButton);
