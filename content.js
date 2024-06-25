@@ -79,6 +79,10 @@ window.addEventListener('load', () => {
   qcFailButton.style.backgroundColor = "Red";
   mainSectionContainer.appendChild(qcFailButton);
 
+  // Disable QC buttons initially
+  qcPassButton.disabled = true;
+  qcFailButton.disabled = true;
+
   // Debounce function implementation
   function debounce(func, delay) {
     let timer;
@@ -89,6 +93,26 @@ window.addEventListener('load', () => {
       }, delay);
     };
   }
+  function monitorSubmitButtonState() {
+    const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
+
+    if (submitButton) {
+      
+      console.log("found");
+      submitButton.addEventListener('click', () => {
+        qcPassButton.disabled = !submitButton.disabled;
+        qcFailButton.disabled = !submitButton.disabled;
+      });
+
+      // Check initial state
+      qcPassButton.disabled = submitButton.disabled;
+      qcFailButton.disabled = submitButton.disabled;
+    }
+  }
+
+  // Monitor the Submit button state
+  monitorSubmitButtonState();
+
   qcPassButton.addEventListener('click', () => {
     console.log('QC Pass button clicked');
     checkAndSendData('QC Pass');
@@ -207,6 +231,9 @@ window.addEventListener('load', () => {
       localStorage.setItem('capturedData', JSON.stringify(data));
       console.log('Data stored locally:', data);
     });
+
+    // Function to monitor the Submit button state
+
 
     // Debounce function for checkAndSendData to prevent multiple submissions
     const debouncedCheckAndSendData = debounce((claimStatus) => {
