@@ -154,8 +154,10 @@ window.addEventListener('load', () => {
     const email = emailElement ? emailElement.innerText.trim() : 'N/A';
 
     // Capture the Case ID
-    const caseIdElement = document.querySelector('div[data-v-7c7aad76] b[data-v-7c7aad76]');
+    const caseIdElement = document.querySelector('div[class=""] > button[class="unass_cases"] > div[class=""] > b[data-v-012f2b64=""]')
     const caseId = caseIdElement ? caseIdElement.innerText.trim() : 'N/A';
+    console.log(caseIdElement);
+    console.log(caseId);
 
     // Capture the caseType based on the presence of targetImageSrc (assumed to be defined)
     const targetImageSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAxdEVYdENyZWF0aW9uIFRpbWUAVHVlc2RheSAyNCBPY3RvYmVyIDIwMjMgMDE6MjY6MTUgUE1IQK2TAAAEG0lEQVRYhe2Yz08bRxTHv5usvWtjpwYM2GoUhV+KU5VKTqJECqRS6X9AEkLSQ8G5UtSeIoxURQk4p7YKyi3xkkOJ2iZnuDQ+JI7UtKkslYiKukVQhWIqbEd4sdc/WOdADTGzy84upuGQ721n9s1+9r0382aGKRaLRexh7XvTAFra84CsUcN0WsbTn9IIh1cxPZ1BLJbHWuG/QVkGLpcJR9/j0NFhw8lTVlRVGfMFozcH5+dyGB9P4uGPKeRydKYcx6DzYzsufVKNw4fNuwMoSTLu3I7jwf2XWFvT9Y0NsSyDc+cd8F2ugcVC51EqwNnZHIavxxD9I2uMbIuOHOEx6K9Hcwu3c8DnUxKG/P8gkTDoNhU5nSyuDbvR1sYbB5ydzeKLzxeQiFcWriSnk8VXX7+Lpmb1vFRNhExGxvD1pV2DA4Dl5QICI0tIp2XVd1SXmeCd+LY519rKwWYr/z9RlBGN6svTmRkJQjCO/s/qFPsVQzw/l0Pvp/MoFNQHHr11EF6vRbU/EslgcmIFkxMrmpAmM4OgcAiNjWSoFUM8/m1yWzgaeb0W+IcaINw9RHh6q/K5Ir67l1TsIyxFcQ2hUEoXjCjKiEQyiuFtbeXQfaFac4xQKIVUisx3AvDZLxlks/o2ONFoFgP9L+Dr/Rtn2qMIjCyV9Z/vdmiOIUlF/Posow0YDou64JQ0ObGCx482x9EKcUlPnqwSbYTl8ylpB2ibEkX1pUNNU79ReDBegXXP5TbhzIe2jefYYp7KLh4nZyaxDkqS/j93u1j4LtcCAFpazPAes5aFdXR0mWocSSJz3/B+8HW53Cb0+WoU+8aERFk+6hUByPOM4p8Y0UD/C0QiZF6piecZoo3Iwdpa/U6NLeYxJiQwJiTK2r3HrLrGcTrJbxMtbR9YsLBAl9QlLcYKEILxjedSuPt8NXj8SKSuz++3kaWT8GB7e5UuuK364ftk2awN3HBTr4OnT5PfJiyPn7Ao5gKtRFEuqyTrE6hW047nGRw/QeFBu30/OjvthgGB9Z3M6zO3+4Jj250PAHzUaceBA/u1AQGg51I1TGbjXgSAwMhSWTXxDzWohtpsZtBzUXlDoWjR2GhGV9c7OwIURRljwubE2S7UXWcdaGpS3varnknSaRkD/QuYmalMbVaTx8Phm5sHVb2rOr2s1n3wDzUork2VUn09iyuD6qEHNO5mmprNuDbs3hXIujoWX151oUXjbEx1cP/rzyxuBP6tWLg9Hg5XBhs04agBgfVjqBBM4MH9lygUjNVqk4nB2XMO9PbVUF8m6b48mpvL4d54EqGHKeqjAc+vXx71XKxWPLlVFLCk1VUZPz9NIxwW8ft0FrFYfsOzLMvA7TbBc5RDe4cNp05aUUVZ7ioG+H9pz9+wvgXcqfY84Ctvoo39/B4rCgAAAABJRU5ErkJggg==';
