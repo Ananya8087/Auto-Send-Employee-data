@@ -1,5 +1,20 @@
 window.addEventListener('load', () => {
   console.log('Window loaded, capturing initial data');
+  const style = document.createElement('style');
+  style.textContent = `
+    .notification {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      background-color: #4caf50; /* Green background */
+      color: white; /* White text */
+      border-radius: 5px; /* Rounded corners */
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      z-index: 1000; /* Ensure it is on top */
+    }
+  `;
+  document.head.appendChild(style);
 
   // Function to wait until the sidebar is loaded
   function waitForSidebarElement(callback) {
@@ -23,15 +38,49 @@ window.addEventListener('load', () => {
       },
       body: JSON.stringify(data),
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text(); // Use text instead of JSON since no-cors mode prevents proper JSON parsing
+    })
     .then(result => {
       console.log('Data sent successfully:', result);
+      qcPassButton.disabled = true; // Re-enable buttons after delay
+      qcFailButton.disabled = true;
+      showNotification('Data sent successfully');
+
+      console.log("time for delay");
+      setTimeout(() => {
+        qcPassButton.disabled = false; // Re-enable buttons after delay
+        qcFailButton.disabled = false;
+      }, 1000); // 1 second delay
+    
+
       // Handle success if needed
     })
     .catch(error => {
       console.error('Error sending data:', error);
+      //showNotification('Error sending data');
       // Handle error if needed
+      qcPassButton.disabled = true; // Re-enable buttons after delay
+      qcFailButton.disabled = true;
+      setTimeout(() => {
+        qcPassButton.disabled = false; // Re-enable buttons after delay
+        qcFailButton.disabled = false;
+      }, 1000); // 1 second delay
     });
+  }
+  // Function to show notification
+  function showNotification(message) {
+    console.log('Showing notification:', message); // Debug statement
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.remove();
+    }, 3000); // Remove notification after 3 seconds
   }
 
   // Function to fetch all caseIds from Google Sheets
@@ -57,6 +106,7 @@ window.addEventListener('load', () => {
     data = JSON.parse(storedData);
     console.log('Retrieved stored data:', data);
   }
+  
 
   // Create QC Pass and QC Fail Buttons
   const mainSectionContainer = document.querySelector('.mainsection.d-md-flex');
@@ -161,22 +211,32 @@ window.addEventListener('load', () => {
       if (exists) {
         console.log('Duplicate case ID found:', currentCaseId);
         console.log('Data not sent to Google Sheets.');
+
+        showNotification('Error sending data');
       } else {
         console.log('No duplicate found. Sending data to Google Sheets.');
+        qcPassButton.disabled = true; 
+        qcFailButton.disabled = true;
+        showNotification('Data sent successfully');
 
         // Send data with claim status as QC Pass or QC Fail
         sendDataToGoogleSheet(data, claimStatus);
       }
     });
   }
+  
   qcPassButton.addEventListener('click', () => {
     console.log('QC Pass button clicked');
+    qcPassButton.disabled = true; 
+    qcFailButton.disabled = true;
     checkAndSendData('QC Pass');
   });
 
   // Add click listener to QC Fail button with debounce
   qcFailButton.addEventListener('click', () => {
     console.log('QC Fail button clicked');
+    qcPassButton.disabled = true; 
+    qcFailButton.disabled = true;
     checkAndSendData('QC Fail');
   });
   function extractDetailAmountWithDelay(callback) {
@@ -227,12 +287,19 @@ window.addEventListener('load', () => {
     const caseTypeElement = document.querySelector(`img[src="${targetImageSrc}"]`);
     const caseType = caseTypeElement ? 'RI' : 'PA';
 
+    const cashDiscountElement = document.querySelector('input[data-v-d19b1848].p-inputtext.p-component.p-filled.subm_field.form-control[placeholder="enter amount"]');
+    const cashDiscount = cashDiscountElement ? cashDiscountElement.value.trim() : 'N/A';
+
+
+    
+
+
     // Create the data object
     data = {
       caseType: caseType,
       email: email || 'N/A',
       caseId: caseId || 'N/A',
-      cashDiscount: 'N/A',
+      cashDiscount: cashDiscount||'N/A',
       claimedAmount: claimedAmount || 'N/A', // Placeholder for claimedAmount
       detailAmount: 'N/A'   // Placeholder for detailAmount
     };
@@ -250,8 +317,10 @@ window.addEventListener('load', () => {
     }
 
     // Add input event listener to cashDiscountElement
-    const cashDiscountElement = sidebarElement.querySelector('.p-field.p-col input[type="text"][placeholder="enter amount"]');
-    cashDiscountElement.addEventListener('input', updateCashDiscount);
+    //const cashDiscountElement = sidebarElement.querySelector('.p-field.p-col input[type="text"][placeholder="enter amount"]');
+    if (cashDiscountElement) {
+      cashDiscountElement.addEventListener('input', updateCashDiscount);
+  }
 
     // Function to find the element and extract its inner text with a delay
     function extractDetailAmountWithDelay(callback) {
@@ -296,6 +365,21 @@ window.addEventListener('load', () => {
       localStorage.setItem('capturedData', JSON.stringify(data));
       console.log('Data stored locally:', data);
     });
+    // Add CSS for notification
+const style = document.createElement('style');
+style.textContent = `
+.notification {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  z-index: 1000; /* Ensure it is on top */
+}
+`;
 
     // Debounce function for checkAndSendData to prevent multiple submissions
     const debouncedCheckAndSendData = debounce((claimStatus) => {
@@ -306,12 +390,16 @@ window.addEventListener('load', () => {
     // Add click listener to QC Pass button with debounce
     qcPassButton.addEventListener('click', () => {
       console.log('QC Pass button clicked');
+      qcPassButton.disabled = true;
+      qcFailButton.disabled = true;
       debouncedCheckAndSendData('QC Pass');
     });
 
     // Add click listener to QC Fail button with debounce
     qcFailButton.addEventListener('click', () => {
       console.log('QC Fail button clicked');
+      qcPassButton.disabled = true;
+      qcFailButton.disabled = true;
       debouncedCheckAndSendData('QC Fail');
     });
   });
