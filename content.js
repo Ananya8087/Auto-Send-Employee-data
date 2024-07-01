@@ -176,27 +176,31 @@ window.addEventListener('load', () => {
     console.log('Data stored locally:', data);
   });
 
-  // Function to monitor the Submit button state
-  function monitorSubmitButtonState() {
-    const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
+// Function to monitor the Submit button state
+function monitorSubmitButtonState() {
+  const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
 
-    if (submitButton) {
-      const observer = new MutationObserver(() => {
-        qcPassButton.disabled = submitButton.disabled;
-        qcFailButton.disabled = submitButton.disabled;
-      });
-
-      // Observe changes to the submit button's attributes
-      observer.observe(submitButton, { attributes: true, attributeFilter: ['disabled'] });
-
-      // Initial check
+  if (submitButton) {
+    const observer = new MutationObserver(() => {
       qcPassButton.disabled = submitButton.disabled;
       qcFailButton.disabled = submitButton.disabled;
-    }
-  }
+      if (!submitButton.disabled) {
+        console.log("yes");
+        setTimeout(() => {
+          submitButton.disabled = true; // Disable the submit button when it's enabled after a delay
+        }, 500); // 100 milliseconds delay
+      }
+    });
 
-  // Monitor the Submit button state
-  monitorSubmitButtonState();
+    // Observe changes to the submit button's attributes
+    observer.observe(submitButton, { attributes: true, attributeFilter: ['disabled'] });
+
+    // Initial check
+    qcPassButton.disabled = submitButton.disabled;
+    qcFailButton.disabled = submitButton.disabled;
+  }
+}
+monitorSubmitButtonState();
 
  
 
@@ -218,27 +222,42 @@ window.addEventListener('load', () => {
         qcPassButton.disabled = true; 
         qcFailButton.disabled = true;
         showNotification('Data sent successfully');
+        //const updatedCashDiscountValue = cashDiscountValue + mouDiscountValue;
+        
+
+        //console.log('Updated Cash Discount Value:', data.cashDiscount);
+        //sendDataToGoogleSheet(data, claimStatus);
 
         // Send data with claim status as QC Pass or QC Fail
         sendDataToGoogleSheet(data, claimStatus);
       }
     });
   }
-  
-  qcPassButton.addEventListener('click', () => {
-    console.log('QC Pass button clicked');
-    qcPassButton.disabled = true; 
-    qcFailButton.disabled = true;
-    checkAndSendData('QC Pass');
-  });
+  //const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
 
-  // Add click listener to QC Fail button with debounce
-  qcFailButton.addEventListener('click', () => {
-    console.log('QC Fail button clicked');
-    qcPassButton.disabled = true; 
-    qcFailButton.disabled = true;
-    checkAndSendData('QC Fail');
-  });
+qcPassButton.addEventListener('click', () => {
+  console.log('QC Pass button clicked');
+  checkAndSendData('QC Pass');
+  const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
+  submitButton.disabled = false; // Enable submit button
+
+  // Disable the submit button after it's clicked
+  submitButton.addEventListener('click', () => {
+    submitButton.disabled = true;
+  }, { once: true });
+});
+
+qcFailButton.addEventListener('click', () => {
+  console.log('QC Fail button clicked');
+  checkAndSendData('QC Fail');
+  const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
+  submitButton.disabled = false; // Enable submit button
+
+  // Disable the submit button after it's clicked
+  submitButton.addEventListener('click', () => {
+    submitButton.disabled = true;
+  }, { once: true });
+});
   function extractDetailAmountWithDelay(callback) {
     // Find the element
     var detailAmountElement = document.querySelector('p.detail_amnt_data b');
@@ -268,6 +287,7 @@ window.addEventListener('load', () => {
     localStorage.setItem('capturedData', JSON.stringify(data));
     console.log('Data stored locally:', data);
   });
+  
 
   // Wait for the sidebar element
   waitForSidebarElement((sidebarElement) => {
@@ -287,8 +307,24 @@ window.addEventListener('load', () => {
     const caseTypeElement = document.querySelector(`img[src="${targetImageSrc}"]`);
     const caseType = caseTypeElement ? 'RI' : 'PA';
 
-    const cashDiscountElement = document.querySelector('input[data-v-d19b1848].p-inputtext.p-component.p-filled.subm_field.form-control[placeholder="enter amount"]');
-    const cashDiscount = cashDiscountElement ? cashDiscountElement.value.trim() : 'N/A';
+    const cashDiscountElement = document.querySelector('.p-sidebar.p-component.p-sidebar-right.p-sidebar-active div.p-field.p-col input[placeholder="enter amount"]');
+    const cashDiscount = cashDiscountElement ? cashDiscountElement.value.trim() : '0';
+
+    const mouDiscountElement = sidebarElement.querySelector('.p-field.p-col label[for="lastname"].field_label + input.p-inputtext.p-component.p-filled.subm_field.form-control');
+    const mouDiscountValue = mouDiscountElement ? mouDiscountElement.value.trim() : '0';
+    console.log("mou",mouDiscountValue);
+    data.mouDiscount = parseInt(mouDiscountValue); // Update data object with new MOU Discount value
+    const updatedCashDiscountValue = parseInt(cashDiscount) + parseInt(mouDiscountValue);
+    console.log(updatedCashDiscountValue.toString());
+    //cashDiscountElement.value = updatedCashDiscountValue.toFixed(2);
+    //data.cashDiscount = updatedCashDiscountValue.toFixed(2);
+    console.log(updatedCashDiscountValue);
+
+    console.log('Updated Cash Discount Value:', data.cashDiscount);
+
+    //console.log('Updated cashDiscount:', cashDiscountValue);
+    console.log('Updated MOU Discount:', mouDiscountValue);
+    console.log(data);
 
 
     
@@ -299,7 +335,7 @@ window.addEventListener('load', () => {
       caseType: caseType,
       email: email || 'N/A',
       caseId: caseId || 'N/A',
-      cashDiscount: cashDiscount||'N/A',
+      cashDiscount: parseInt(cashDiscount)+parseInt(mouDiscountValue)||'0',
       claimedAmount: claimedAmount || 'N/A', // Placeholder for claimedAmount
       detailAmount: 'N/A'   // Placeholder for detailAmount
     };
@@ -310,9 +346,21 @@ window.addEventListener('load', () => {
     // Function to update cashDiscount when the Update button is clicked
     function updateCashDiscount() {
       const cashDiscountElement = sidebarElement.querySelector('.p-field.p-col input[type="text"][placeholder="enter amount"]');
-      const cashDiscountValue = cashDiscountElement ? cashDiscountElement.value.trim() : 'N/A';
-      data.cashDiscount = cashDiscountValue; // Update data object with new cashDiscount value
-      console.log('Updated cashDiscount:', cashDiscountValue);
+      const cashDiscountValue = cashDiscountElement ? cashDiscountElement.value.trim() : '0';
+      const mouDiscountElement = sidebarElement.querySelector('.p-field.p-col label[for="lastname"].field_label + input.p-inputtext.p-component.p-filled.subm_field.form-control');
+      const mouDiscountValue = mouDiscountElement ? mouDiscountElement.value.trim() : '0';
+      console.log("mou",mouDiscountValue);
+      console.log("cash disc",cashDiscountValue);
+      data.mouDiscount = parseInt(mouDiscountValue); // Update data object with new MOU Discount value
+      const updatedCashDiscountValue = parseInt(cashDiscountValue) + parseInt(mouDiscountValue);
+      console.log(updatedCashDiscountValue.toString());
+      //cashDiscountElement.value = updatedCashDiscountValue.toFixed(2);
+      //data.cashDiscount = updatedCashDiscountValue.toFixed(2);
+      console.log(updatedCashDiscountValue);
+
+      console.log('Updated Cash Discount Value:', updatedCashDiscountValue);
+      data.cashDiscount = updatedCashDiscountValue; // Update data object with new cashDiscount value
+      console.log('Updated cashDiscount:', updatedCashDiscountValue);
       console.log(data);
     }
 
@@ -387,19 +435,25 @@ style.textContent = `
       checkAndSendData(claimStatus);
     }, 1000); // 1000 milliseconds debounce delay (1 second)
 
+    const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
+
     // Add click listener to QC Pass button with debounce
     qcPassButton.addEventListener('click', () => {
       console.log('QC Pass button clicked');
+      submitButton.disabled = false;
       qcPassButton.disabled = true;
       qcFailButton.disabled = true;
+      //submitButton.disabled = false;
       debouncedCheckAndSendData('QC Pass');
     });
 
     // Add click listener to QC Fail button with debounce
     qcFailButton.addEventListener('click', () => {
       console.log('QC Fail button clicked');
+      submitButton.disabled = false;
       qcPassButton.disabled = true;
       qcFailButton.disabled = true;
+      //submitButton.disabled = false;
       debouncedCheckAndSendData('QC Fail');
     });
   });
