@@ -183,7 +183,7 @@ function monitorSubmitButtonState() {
   if (submitButton) {
     const observer = new MutationObserver(() => {
       qcPassButton.disabled = submitButton.disabled;
-      qcFailButton.disabled = submitButton.disabled;
+      //qcFailButton.disabled = submitButton.disabled;
       if (!submitButton.disabled) {
         console.log("yes");
         setTimeout(() => {
@@ -197,7 +197,7 @@ function monitorSubmitButtonState() {
 
     // Initial check
     qcPassButton.disabled = submitButton.disabled;
-    qcFailButton.disabled = submitButton.disabled;
+    //qcFailButton.disabled = submitButton.disabled;
   }
 }
 monitorSubmitButtonState();
@@ -220,7 +220,7 @@ monitorSubmitButtonState();
       } else {
         console.log('No duplicate found. Sending data to Google Sheets.');
         qcPassButton.disabled = true; 
-        qcFailButton.disabled = true;
+        //qcFailButton.disabled = true;
         showNotification('Data sent successfully');
         //const updatedCashDiscountValue = cashDiscountValue + mouDiscountValue;
         
@@ -450,9 +450,9 @@ style.textContent = `
     // Add click listener to QC Fail button with debounce
     qcFailButton.addEventListener('click', () => {
       console.log('QC Fail button clicked');
-      submitButton.disabled = false;
+      //submitButton.disabled = false;
       qcPassButton.disabled = true;
-      qcFailButton.disabled = true;
+      //qcFailButton.disabled = true;
       //submitButton.disabled = false;
       debouncedCheckAndSendData('QC Fail');
     });
