@@ -24,7 +24,7 @@ window.addEventListener('load', () => {
         clearInterval(checkInterval);
         callback(sidebarElement);
       }
-    }, 500); // Check every 500ms
+    }, 100); // Check every 500ms
   }
 
   // Function to send data to Google Sheets with claim status
@@ -45,12 +45,12 @@ window.addEventListener('load', () => {
       return response.text(); // Use text instead of JSON since no-cors mode prevents proper JSON parsing
     })
     .then(result => {
+      qcPassButton.disabled = true;
       console.log('Data sent successfully:', result);
-      qcPassButton.disabled = true; // Re-enable buttons after delay
-      //qcFailButton.disabled = true;
+      
       showNotification('Data sent successfully');
-
-      console.log("time for delay");
+      qcPassButton.disabled = true; 
+      qcFailButton.disabled = true;
       setTimeout(() => {
         qcPassButton.disabled = false; // Re-enable buttons after delay
         qcFailButton.disabled = false;
@@ -63,7 +63,7 @@ window.addEventListener('load', () => {
       console.error('Error sending data:', error);
       //showNotification('Error sending data');
       // Handle error if needed
-      qcPassButton.disabled = true; // Re-enable buttons after delay
+      qcPassButton.disabled = true; 
       qcFailButton.disabled = true;
       setTimeout(() => {
         qcPassButton.disabled = false; // Re-enable buttons after delay
@@ -131,6 +131,7 @@ window.addEventListener('load', () => {
 
   // Disable QC buttons initially
   qcPassButton.disabled = true;
+
   //qcFailButton.disabled = true;
 
   
@@ -237,6 +238,7 @@ monitorSubmitButtonState();
 
 qcPassButton.addEventListener('click', () => {
   console.log('QC Pass button clicked');
+  qcPassButton.disabled = true;
   checkAndSendData('QC Pass');
   const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
   submitButton.disabled = false; // Enable submit button
@@ -433,24 +435,25 @@ style.textContent = `
     const debouncedCheckAndSendData = debounce((claimStatus) => {
       console.log('Debounced sending data to Google Sheets');
       checkAndSendData(claimStatus);
-    }, 1000); // 1000 milliseconds debounce delay (1 second)
+    }, 2000); // 1000 milliseconds debounce delay (1 second)
 
     const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
 
     // Add click listener to QC Pass button with debounce
     qcPassButton.addEventListener('click', () => {
+      qcPassButton.disabled = true;
       console.log('QC Pass button clicked');
-      submitButton.disabled = false;
+      //submitButton.disabled = false;
       qcPassButton.disabled = true;
       qcFailButton.disabled = true;
-      //submitButton.disabled = false;
+      submitButton.disabled = false;
       debouncedCheckAndSendData('QC Pass');
     });
 
     // Add click listener to QC Fail button with debounce
     qcFailButton.addEventListener('click', () => {
       console.log('QC Fail button clicked');
-      //submitButton.disabled = false;
+      submitButton.disabled = true;
       qcPassButton.disabled = true;
       //qcFailButton.disabled = true;
       //submitButton.disabled = false;
