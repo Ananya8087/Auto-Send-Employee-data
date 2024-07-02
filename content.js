@@ -47,7 +47,7 @@ window.addEventListener('load', () => {
     .then(result => {
       console.log('Data sent successfully:', result);
       qcPassButton.disabled = true; // Re-enable buttons after delay
-      qcFailButton.disabled = true;
+      //qcFailButton.disabled = true;
       showNotification('Data sent successfully');
 
       console.log("time for delay");
@@ -131,7 +131,7 @@ window.addEventListener('load', () => {
 
   // Disable QC buttons initially
   qcPassButton.disabled = true;
-  qcFailButton.disabled = true;
+  //qcFailButton.disabled = true;
 
   
   
