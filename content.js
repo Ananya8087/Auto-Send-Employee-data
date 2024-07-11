@@ -45,7 +45,7 @@ window.addEventListener('load', () => {
       return response.text(); // Use text instead of JSON since no-cors mode prevents proper JSON parsing
     })
     .then(result => {
-      qcPassButton.disabled = true;
+      //qcPassButton.disabled = true;
       console.log('Data sent successfully:', result);
       
       showNotification('Data sent successfully');
@@ -64,7 +64,7 @@ window.addEventListener('load', () => {
       //showNotification('Error sending data');
       // Handle error if needed
       //qcPassButton.disabled = true; 
-      qcFailButton.disabled = true;
+      //qcFailButton.disabled = true;
       setTimeout(() => {
         qcPassButton.disabled = false; // Re-enable buttons after delay
         qcFailButton.disabled = false;
@@ -115,7 +115,7 @@ window.addEventListener('load', () => {
   qcPassButton.style.position = "absolute";
   qcPassButton.textContent = 'QC Pass';
   qcPassButton.className = 'qcButton';
-  qcPassButton.style.top = '100px';
+  qcPassButton.style.top = '92px';
   qcPassButton.style.right = '115px';
   qcPassButton.style.backgroundColor = "LawnGreen";
   mainSectionContainer.appendChild(qcPassButton);
@@ -130,7 +130,7 @@ window.addEventListener('load', () => {
   mainSectionContainer.appendChild(qcFailButton);
 
   // Disable QC buttons initially
-  qcPassButton.disabled = true;
+  //qcPassButton.disabled = true;
 
   //qcFailButton.disabled = true;
 
@@ -183,21 +183,21 @@ function monitorSubmitButtonState() {
 
   if (submitButton) {
     const observer = new MutationObserver(() => {
-      qcPassButton.disabled = submitButton.disabled;
+      //qcPassButton.disabled = submitButton.disabled;
       //qcFailButton.disabled = submitButton.disabled;
       if (!submitButton.disabled) {
         console.log("yes");
         setTimeout(() => {
-          submitButton.disabled = true; // Disable the submit button when it's enabled after a delay
-        }, 1000); // 100 milliseconds delay
+          //submitButton.disabled = true; // Disable the submit button when it's enabled after a delay
+        }, 100); // 100 milliseconds delay
       }
     });
 
     // Observe changes to the submit button's attributes
-    observer.observe(submitButton, { attributes: true, attributeFilter: ['disabled'] });
+    //observer.observe(submitButton, { attributes: true, attributeFilter: ['disabled'] });
 
     // Initial check
-    qcPassButton.disabled = submitButton.disabled;
+    //qcPassButton.disabled = submitButton.disabled;
     //qcFailButton.disabled = submitButton.disabled;
   }
 }
@@ -216,6 +216,7 @@ monitorSubmitButtonState();
       if (exists) {
         console.log('Duplicate case ID found:', currentCaseId);
         console.log('Data not sent to Google Sheets.');
+        qcPassButton.parentNode.removeChild(qcPassButton);
 
         showNotification('Error sending data');
       } else {
@@ -242,15 +243,13 @@ monitorSubmitButtonState();
 
 qcPassButton.addEventListener('click', () => {
   console.log('QC Pass button clicked');
-  qcPassButton.disabled = true;
+  //qcPassButton.disabled = true;
   checkAndSendData('QC Pass');
   const submitButton = document.querySelector('.btn_header.submit_btn.qc_submit_btn.blue_btn');
-  submitButton.disabled = false; // Enable submit button
+  //submitButton.disabled = false; // Enable submit button
 
   // Disable the submit button after it's clicked
-  submitButton.addEventListener('click', () => {
-    submitButton.disabled = true;
-  }, { once: true });
+
 });
 
 qcFailButton.addEventListener('click', () => {
@@ -305,7 +304,7 @@ qcFailButton.addEventListener('click', () => {
     const email = emailElement ? emailElement.innerText.trim() : 'N/A';
 
     // Capture the Case ID
-    const caseIdElement = document.querySelector('div[class=""] > button[class="unass_cases"] > div[class=""] > b[data-v-012f2b64=""]');
+    const caseIdElement = document.querySelector('div[data-v-5b096a03=""] > b[data-v-5b096a03=""]');
     const caseId = caseIdElement ? caseIdElement.innerText.trim() : 'N/A';
 
     // Capture the caseType based on the presence of targetImageSrc (assumed to be defined)
@@ -450,7 +449,7 @@ style.textContent = `
       //submitButton.disabled = false;
       qcPassButton.disabled = true;
       qcFailButton.disabled = true;
-      submitButton.disabled = false;
+      //submitButton.disabled = false;
       debouncedCheckAndSendData('QC Pass');
     });
 
