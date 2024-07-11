@@ -30,7 +30,7 @@ window.addEventListener('load', () => {
   // Function to send data to Google Sheets with claim status
   function sendDataToGoogleSheet(data, claimStatus) {
     data.claim_status = claimStatus; // Update claim status in data object
-    fetch('https://script.google.com/macros/s/AKfycbyTkJysE2o5dxmNNk18-7LUybw130On4MzghRThE7TUzTgkS0No2V5S2_491-3lrqZw/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbyK22bDtCmazl7VqSR69-sgnGrVr7o3A-LD577nLHwW6wF-d3zzqqoluU1KGUk9ETmOvw/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: {
@@ -49,7 +49,7 @@ window.addEventListener('load', () => {
       console.log('Data sent successfully:', result);
       
       showNotification('Data sent successfully');
-      qcPassButton.disabled = true; 
+      //qcPassButton.disabled = true; 
       qcFailButton.disabled = true;
       setTimeout(() => {
         qcPassButton.disabled = false; // Re-enable buttons after delay
@@ -63,7 +63,7 @@ window.addEventListener('load', () => {
       console.error('Error sending data:', error);
       //showNotification('Error sending data');
       // Handle error if needed
-      qcPassButton.disabled = true; 
+      //qcPassButton.disabled = true; 
       qcFailButton.disabled = true;
       setTimeout(() => {
         qcPassButton.disabled = false; // Re-enable buttons after delay
@@ -85,7 +85,7 @@ window.addEventListener('load', () => {
 
   // Function to fetch all caseIds from Google Sheets
   function fetchAllCaseIds(callback) {
-    fetch('https://script.google.com/macros/s/AKfycbyTkJysE2o5dxmNNk18-7LUybw130On4MzghRThE7TUzTgkS0No2V5S2_491-3lrqZw/exec')
+    fetch('https://script.google.com/macros/s/AKfycbyK22bDtCmazl7VqSR69-sgnGrVr7o3A-LD577nLHwW6wF-d3zzqqoluU1KGUk9ETmOvw/exec')
       .then(response => response.json())
       .then(allData => {
         console.log('Existing case IDs:', allData.caseIds);
@@ -115,7 +115,7 @@ window.addEventListener('load', () => {
   qcPassButton.style.position = "absolute";
   qcPassButton.textContent = 'QC Pass';
   qcPassButton.className = 'qcButton';
-  qcPassButton.style.top = '45px';
+  qcPassButton.style.top = '100px';
   qcPassButton.style.right = '115px';
   qcPassButton.style.backgroundColor = "LawnGreen";
   mainSectionContainer.appendChild(qcPassButton);
@@ -189,7 +189,7 @@ function monitorSubmitButtonState() {
         console.log("yes");
         setTimeout(() => {
           submitButton.disabled = true; // Disable the submit button when it's enabled after a delay
-        }, 500); // 100 milliseconds delay
+        }, 1000); // 100 milliseconds delay
       }
     });
 
@@ -220,9 +220,13 @@ monitorSubmitButtonState();
         showNotification('Error sending data');
       } else {
         console.log('No duplicate found. Sending data to Google Sheets.');
+        console.log(data);
+        console.log('Saved Data:', data);
+
         qcPassButton.disabled = true; 
         //qcFailButton.disabled = true;
         showNotification('Data sent successfully');
+        qcPassButton.parentNode.removeChild(qcPassButton);
         //const updatedCashDiscountValue = cashDiscountValue + mouDiscountValue;
         
 
@@ -441,7 +445,7 @@ style.textContent = `
 
     // Add click listener to QC Pass button with debounce
     qcPassButton.addEventListener('click', () => {
-      qcPassButton.disabled = true;
+      //qcPassButton.disabled = true;
       console.log('QC Pass button clicked');
       //submitButton.disabled = false;
       qcPassButton.disabled = true;
